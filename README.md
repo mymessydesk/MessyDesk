@@ -5,7 +5,7 @@ MessyDesk is a tool with graphical user interface for collecting, organising and
 MessyDesk is based on graph database, event queue and microservices. 
 
 ## Services
-Services are either external APIs or local containers (with API). Service can be for example a language detection service, service for extracting images from PDF or optical character rekognition service. Techinally service can be a wrapper for a Python program, for example, or it can call external API (like Google Vision). 
+Services are either external APIs or local containers (with API). Service can be for example a language detection service, service for extracting images from PDF or optical character recognition service. Techinally service can be a wrapper for a Python program, for example, or it can call external API (like Google Vision). 
 
 Service must implement MD-service API.
 
@@ -33,8 +33,10 @@ In order to use service, MessyDesk must know where it is. This is done by regist
 ##### POST /register
 - payload: {url: [URL]} // register service in url.
 
-### Calling service
+### Event queue and calling service
 Calling a service is simple. Basically one ask from /info endpoint what options service has and then post request with options to /process endpoint.
+In order to make things smooth and fault tolerant, services are called via event queue. It means that when user asks MessyDesk to extract images from 1000 PDF files, this request is sent to event queue which then make requests one by one to the actual service.
+If service dies in the middle of the task, then event queue just notifies MessyDesk about service being down. User can cancel the task or decide to continue it later on when service is back online. 
 
 
 
