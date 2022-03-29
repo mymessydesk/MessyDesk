@@ -1,17 +1,18 @@
 # MessyDesk
+MessyDesk is a tool with graphical user interface for collecting, organising and processing all kind of GLAM staff. MessyDesk is a graph platform where you can build network of information based on your needs. Create a network of data where every item, media file and relationship is important and documentable.
+
+## Technical viewpoint
+MessyDesk is based on graph database, event queue and microservices. 
 
 ## Services
-Services are either external APIs or local containers (with API). Service can be for example a language detection service, service for extracting images from PDF or ...
-Service can be a wrapper for a Python program, for example. Service must implement MD-service API.
-However, if service does not implement MD-service API, then there must be a service adapter for that service.
+Services are either external APIs or local containers (with API). Service can be for example a language detection service, service for extracting images from PDF or optical character rekognition service. Techinally service can be a wrapper for a Python program, for example, or it can call external API (like Google Vision). 
 
-### Service adapters
-MessyDesk must know how to call services and what options services have.
+Service must implement MD-service API.
 
 ### MessyDesk Service API
-Service API is really simple, thera are only two required endpoints. The first one is **/info**, that tells the name of the service, its version, what kind of data it accepts, what it returns and what options can be given to it.
+Service API is really simple, thera are only two required endpoints. The first one is **/info**, that tells the name of the service, version, what kind of data it accepts, what it returns and what options can be given to it.
 
-The second one is **/process** endpoint, that is used when service is required to some work.
+The second one is **/process** endpoint, that is used when service is required to do some work. Note that this endpoint is called by event queue.
 
 ##### GET /info
 - **name**: {String} // name of the service
@@ -26,11 +27,15 @@ Service can produce files or data or both. Depending the type of the service, an
 ##### POST /process
 - **items**: {Array} // list of items for processing
 
+### Registering service
+In order to use service, MessyDesk must know where it is. This is done by registering service with **/register** endpoint. Registering simply means that MD receives the url where new service is located (for example http://localhost:8100). After this, MD asks more information about service from its **/info** endpoint on that URL so that service can be shown in the user interface.
+
+##### POST /register
+- payload: {url: [URL]} // register service in url.
+
 ### Calling service
 Calling a service is simple. Basically one ask from /info endpoint what options service has and then post request with options to /process endpoint.
 
-### Registering service
-In order to use service, MessyDesk must know where it is. This is done by registering service with /register endpoint. Registering simply means that MD receives the url where new service is located. After this, MD asks more information about service from its /info endpoint so that service can be shown in user interface.
 
-##### POST /register
-- payload: {url: [URL]}
+
+
